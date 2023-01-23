@@ -3,8 +3,8 @@ package openengine
 import (
 	"fmt"
 
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/constants"
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/engine"
+	"gitlab.hoitek.fi/openapi/openengine/constants"
+	"gitlab.hoitek.fi/openapi/openengine/engine"
 )
 
 func (p *openEngine) AddErrorResponses(errorResponses engine.ErrorResponses, errorResponseRefs ...string) OpenEngine {

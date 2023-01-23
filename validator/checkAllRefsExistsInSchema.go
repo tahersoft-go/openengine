@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/engine"
+	"gitlab.hoitek.fi/openapi/openengine/engine"
 )
 
 func (v *openApiValidator) checkResponseRefExistsInSchema(responses engine.Responses) {

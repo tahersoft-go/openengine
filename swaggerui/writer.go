@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/engine"
+	"gitlab.hoitek.fi/openapi/openengine/engine"
 )
 
 func CreateFolderIfNotExists(path string) error {

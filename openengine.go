@@ -4,8 +4,8 @@ import (
 	"go/ast"
 	"path"
 
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/engine"
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/validator"
+	"gitlab.hoitek.fi/openapi/openengine/engine"
+	"gitlab.hoitek.fi/openapi/openengine/validator"
 	"gopkg.in/yaml.v2"
 )
 

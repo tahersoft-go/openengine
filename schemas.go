@@ -14,7 +14,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.hoitek.fi/healthcare/services/maja/openengine/engine"
+	"gitlab.hoitek.fi/openapi/openengine/engine"
 )
 
 var WgSchema = &sync.WaitGroup{}

@@ -1,6 +1,6 @@
 package swaggerui
 
-import "gitlab.hoitek.fi/healthcare/services/maja/openengine/engine"
+import "gitlab.hoitek.fi/openapi/openengine/engine"
 
 func HtmlTemplate(config engine.HtmlConfig) string {
 	return `
