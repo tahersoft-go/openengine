@@ -1,6 +1,6 @@
 package openengine
 
-import "gitlab.hoitek.fi/openapi/openengine/engine"
+import "github.com/tahersoft-go/openengine/engine"
 
 func flatSecuritySchemes(securitySchemas engine.SecuritySchemesTypes) engine.SecuritySchemes {
 	flat := engine.SecuritySchemes{}

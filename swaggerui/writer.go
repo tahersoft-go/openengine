@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"gitlab.hoitek.fi/openapi/openengine/engine"
+	"github.com/tahersoft-go/openengine/engine"
 )
 
 func CreateFolderIfNotExists(path string) error {

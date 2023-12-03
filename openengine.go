@@ -4,8 +4,8 @@ import (
 	"go/ast"
 	"path"
 
-	"gitlab.hoitek.fi/openapi/openengine/engine"
-	"gitlab.hoitek.fi/openapi/openengine/validator"
+	"github.com/tahersoft-go/openengine/engine"
+	"github.com/tahersoft-go/openengine/validator"
 	"gopkg.in/yaml.v2"
 )
 

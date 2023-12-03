@@ -4,8 +4,8 @@ import (
 	"log"
 	"path"
 
-	"gitlab.hoitek.fi/openapi/openengine/engine"
-	"gitlab.hoitek.fi/openapi/openengine/swaggerui"
+	"github.com/tahersoft-go/openengine/engine"
+	"github.com/tahersoft-go/openengine/swaggerui"
 )
 
 func (p *openEngine) ExportSwaggerUi(config engine.SwaggerUiConfig) OpenEngine {

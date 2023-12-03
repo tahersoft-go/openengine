@@ -3,7 +3,7 @@ package openengine
 import (
 	"errors"
 
-	"gitlab.hoitek.fi/openapi/openengine/engine"
+	"github.com/tahersoft-go/openengine/engine"
 )
 
 func (p *openEngine) AddTag(tag engine.Tag) OpenEngine {

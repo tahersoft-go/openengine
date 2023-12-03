@@ -1,6 +1,6 @@
 package validator
 
-import "gitlab.hoitek.fi/openapi/openengine/engine"
+import "github.com/tahersoft-go/openengine/engine"
 
 type apiGen struct {
 	err       error

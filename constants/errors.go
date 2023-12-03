@@ -1,6 +1,6 @@
 package constants
 
-import "gitlab.hoitek.fi/openapi/openengine/engine"
+import "github.com/tahersoft-go/openengine/engine"
 
 var DefaultErrorResponses = engine.ErrorResponses{
 	"400": engine.Response{

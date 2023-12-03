@@ -1,6 +1,6 @@
 package swaggerui
 
-import "gitlab.hoitek.fi/openapi/openengine/engine"
+import "github.com/tahersoft-go/openengine/engine"
 
 func HtmlTemplate(config engine.HtmlConfig) string {
 	return `
