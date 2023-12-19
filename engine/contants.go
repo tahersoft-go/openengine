@@ -26,6 +26,7 @@ var IGNORED_FILES_TO_PARS = []string{
 
 const API_PATHS_DATA_REGEXP = `(@.*?)[:]\s+(.*?)\s+\*`
 const API_SCHEMAS_DATA_REGEXP = `(@apiDefine)[:]\s+(.*?)\s+\*`
+const API_ENUMS_DATA_REGEXP = `(@apiEnum)[:]\s+(.*?)\s+\*`
 const API_CUSTOM_REF_REGEXP = `@api(\d{3})ResponseRef`
 const API_CUSTOM_DESCRIPTION_REGEXP = `\w+(\d{3})ResponseDescription`
 

@@ -92,6 +92,7 @@ type SecurityScopesList []string
 type SecurityFlow map[string]SecurityScopesList
 
 type (
+	// EnumsDict     map[string]Enum
 	SchemasDict   map[string]Schema
 	PathsDict     map[string]Operations
 	Properties    map[string]Property
@@ -124,6 +125,7 @@ type OpenApiFieldTagValues struct {
 	Ref       string `yaml:"$ref,omitempty"`
 	Required  bool   `yaml:"required,omitempty"`
 	Nullable  bool   `yaml:"nullable,omitempty"`
+	EnumValue string `yaml:"enumValue,omitempty"`
 	MaxLength string `yaml:"maxLength,omitempty"`
 	MinLength string `yaml:"minLength,omitempty"`
 	Minimum   string `yaml:"minimum,omitempty"`
@@ -224,6 +226,7 @@ type Schema struct {
 	Format     string     `yaml:"format,omitempty"`
 	Properties Properties `yaml:"properties,omitempty"`
 	Required   []string   `yaml:"required,omitempty"`
+	Enum       []string   `yaml:"enum,omitempty"`
 }
 
 // Response

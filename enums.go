@@ -1,25 +1,21 @@
 package openengine
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
-	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/tahersoft-go/openengine/engine"
 )
 
-var WgSchema = &sync.WaitGroup{}
+var WgEnum = &sync.WaitGroup{}
 
-func (p *openEngine) extractSchemaNamesFromComments(schemasFilePath string) ([]string, error) {
+func (p *openEngine) extractEnumNamesFromComments(enumsFilePath string) ([]string, error) {
 	// Create the AST by parsing src.
 	fileSet := token.NewFileSet()
 
@@ -27,11 +23,11 @@ func (p *openEngine) extractSchemaNamesFromComments(schemasFilePath string) ([]s
 	var structNames []string
 
 	// Parse the file containing this struct definitions
-	f, err := parser.ParseFile(fileSet, schemasFilePath, nil, parser.ParseComments)
+	f, err := parser.ParseFile(fileSet, enumsFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return structNames, err
 	}
-	fileName := filepath.Base(schemasFilePath)
+	fileName := filepath.Base(enumsFilePath)
 	// If the file has no comments we return an error
 	if len(f.Comments) == 0 {
 		return structNames, engine.BuildError(fileName, "reading comment file: there is no comments (@api declarations) in the file")
@@ -41,14 +37,14 @@ func (p *openEngine) extractSchemaNamesFromComments(schemasFilePath string) ([]s
 		// log.Printf("comment %#v\n", comment)
 		// If the comment list is empty we return an error
 		if len(comment.List) == 0 {
-			return structNames, engine.BuildError(fileName, "reading comment.List: there is no @api declarations in the file")
+			return structNames, engine.BuildError(fileName, "reading comment.List: there is no comments (@api declarations) in the file")
 		}
 		// log.Println("commentList", comment.List)
 		// Loop through all the comment lines from the list
 		for _, commentLine := range comment.List {
 			// log.Println("commentLine", commentLine)
-			// optional capture second item group with @apiDefine
-			reg := regexp.MustCompile(engine.API_SCHEMAS_DATA_REGEXP)
+			// optional capture second item group with @apiEnum
+			reg := regexp.MustCompile(engine.API_ENUMS_DATA_REGEXP)
 			// Sanitize the comment line text and remove new lines and spaces to make regexp work
 			commentLineText := engine.SanitizeCommentLineText(commentLine.Text)
 			// get second capture from regexp
@@ -75,7 +71,8 @@ func (p *openEngine) extractSchemaNamesFromComments(schemasFilePath string) ([]s
 }
 
 // TODO: refactor this function
-func (p *openEngine) mapSchemaFieldsToSchemaDict(list []*ast.Field, structName string, schemasDict *engine.SchemasDict) {
+func (p *openEngine) mapEnumFieldsToSchemaDict(list []*ast.Field, structName string, enumsDict *engine.SchemasDict) {
+	var enumValues []string
 	for _, field := range list {
 		// log.Printf("-----%s Struct -> %s %#v\n", structName, field.Names[0].Name, field.Type)
 		if field.Tag == nil {
@@ -92,118 +89,29 @@ func (p *openEngine) mapSchemaFieldsToSchemaDict(list []*ast.Field, structName s
 		if tagValues.Ignored {
 			continue
 		}
-		// json tag parsed
-		jsonFieldName := strings.Split(fieldTag.Get(engine.JSON_TAG_NAME), ",")[0]
-		// json fieldName if json tag is not empty
-		fieldName := engine.TerIf(jsonFieldName == "", field.Names[0].Name, strings.Split(jsonFieldName, ",")[0])
 
-		var (
-			tp     string
-			format string
-			ref    string
+		enumValues = append(enumValues, tagValues.EnumValue)
 
-			items *engine.PropertyItems
-
-			maxLength, _ = strconv.Atoi(tagValues.MaxLength)
-			minLength, _ = strconv.Atoi(tagValues.MinLength)
-			maximum, _   = strconv.Atoi(tagValues.Maximum)
-			minimum, _   = strconv.Atoi(tagValues.Minimum)
-
-			in = engine.TerIf(tagValues.In != "", tagValues.In, "query")
-		)
-
-		switch field.Type.(type) {
-		case *ast.Ident:
-			// Get the type of the field
-			t := field.Type.(*ast.Ident).Name
-
-			tp = engine.TerIf(field.Type.(*ast.Ident).Obj == nil, engine.OpenAPITypes(t), "object")
-			format = engine.TerIf(field.Type.(*ast.Ident).Obj == nil, engine.OpenAPIFormats(t), "object")
-			ref = engine.TerIf(field.Type.(*ast.Ident).Obj != nil, "#/components/schemas/"+tagValues.Ref, "")
-			maxLength = engine.TerIf(field.Type.(*ast.Ident).Obj == nil, maxLength, 0)
-			minLength = engine.TerIf(field.Type.(*ast.Ident).Obj == nil, minLength, 0)
-			maximum = engine.TerIf(field.Type.(*ast.Ident).Obj == nil, maximum, 0)
-			minimum = engine.TerIf(field.Type.(*ast.Ident).Obj == nil, minimum, 0)
-
-			// Set current property with specific modelName on SchemasDict
-
-		case *ast.IndexExpr, *ast.SelectorExpr, *ast.ArrayType:
-			if tagValues.Ref == "" {
-				continue
-			}
-
-			tp = "object"
-			format = "object"
-			ref = "#/components/schemas/" + tagValues.Ref
-
-			// if field is array type we set the items ref and clear outer ref
-			if fmt.Sprintf("%T", field.Type) == "*ast.ArrayType" {
-				tp = "array"
-				format = "array"
-				items = &engine.PropertyItems{
-					Ref: ref,
-				}
-				ref = ""
-			}
-		default:
-			log.Printf("field.Type: %#v is not supported yet", field.Type)
-		}
-		// Set current property with specific modelName on SchemasDict
-		(*schemasDict)[structName].Properties[fieldName] = engine.Property{
-			In:        in,
-			Type:      engine.TerIf(ref == "", tp, ""),
-			Format:    engine.TerIf(ref == "", format, ""),
-			Example:   engine.TerIf(ref == "", tagValues.Example, ""),
-			Nullable:  engine.TerIf(ref == "", tagValues.Nullable, false),
-			Pattern:   engine.TerIf(ref == "", tagValues.Pattern, ""),
-			MaxLength: engine.TerIf(ref == "", maxLength, 0),
-			MinLength: engine.TerIf(ref == "", minLength, 0),
-			Maximum:   engine.TerIf(ref == "", maximum, 0),
-			Minimum:   engine.TerIf(ref == "", minimum, 0),
-			Ref:       ref,
-			Items:     items,
-		}
 	}
-
-	// add required to fields with tag `required`
-	for _, field := range list {
-		if field.Tag != nil {
-			// Get the tag value
-			tag := reflect.StructTag(field.Tag.Value[1 : len(field.Tag.Value)-1])
-			// Get the field name
-			fieldName := field.Names[0].Name
-			// If the field has a json tag, use that as the field name
-			jsonFieldName := tag.Get(engine.JSON_TAG_NAME)
-			fieldName = engine.TerIf(jsonFieldName == "", fieldName, strings.Split(jsonFieldName, ",")[0])
-			// Get the example value
-			openApiTagValues := tag.Get(engine.OPEN_API_TAG_NAME)
-			tagValues := engine.ParseStructTagValues(openApiTagValues)
-			schema := (*schemasDict)[structName]
-			if tagValues.Required {
-				schema.Required = append(schema.Required, fieldName)
-			}
-			(*schemasDict)[structName] = schema
-		}
+	// Set current property with specific modelName on SchemasDict
+	(*enumsDict)[structName] = engine.Schema{
+		Enum: enumValues,
 	}
 }
 
-func (p *openEngine) extractSchemasDictFromFile(schemasFilePath string) (engine.SchemasDict, error) {
+func (p *openEngine) extractEnumsDictFromFile(enumsFilePath string) (engine.SchemasDict, error) {
 	var schemasDict = engine.SchemasDict{}
 	// Create the AST by parsing src.
 	fileSet := token.NewFileSet()
 
 	// Parse the file containing this struct definitions
-	f, err := parser.ParseFile(fileSet, schemasFilePath, nil, parser.ParseComments)
+	f, err := parser.ParseFile(fileSet, enumsFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, err
 	}
 
 	// structNames, err := ExtractDataFromComments(schemasFilePath)
-	structNames, err := p.extractSchemaNamesFromComments(schemasFilePath)
-	if err != nil {
-		return nil, err
-	}
-
+	structNames, err := p.extractEnumNamesFromComments(enumsFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -227,12 +135,11 @@ func (p *openEngine) extractSchemasDictFromFile(schemasFilePath string) (engine.
 						// Create a new Schema for the struct
 						schemasDict[structName] = engine.Schema{
 							// This is a hack to get the type of the struct
-							Type:       "object",
-							Format:     "object",
-							Properties: engine.Properties{},
+							Type: "string",
+							Enum: []string{},
 						}
 						// Loop through all the fields in the struct
-						p.mapSchemaFieldsToSchemaDict(structType.Fields.List, structName, &schemasDict)
+						p.mapEnumFieldsToSchemaDict(structType.Fields.List, structName, &schemasDict)
 					}
 				}
 			}
@@ -242,9 +149,9 @@ func (p *openEngine) extractSchemasDictFromFile(schemasFilePath string) (engine.
 	return schemasDict, nil
 }
 
-func (p *openEngine) extractSchemasFromDirectory(structsDirPath string, chanSchemas chan engine.ChanSchemas) (engine.SchemasDict, error) {
+func (p *openEngine) extractEnumsFromDirectory(structsDirPath string, chanSchemas chan engine.ChanSchemas) (engine.SchemasDict, error) {
 	// Done waitgroup for this goroutine
-	defer WgSchema.Done()
+	defer WgEnum.Done()
 
 	// Create AllSchemasDict
 	var AllSchemasDict = engine.SchemasDict{}
@@ -275,7 +182,7 @@ func (p *openEngine) extractSchemasFromDirectory(structsDirPath string, chanSche
 		}
 
 		// Extract the schemas from the file
-		schemasDict, err := p.extractSchemasDictFromFile(structsDirPath + "/" + file.Name())
+		schemasDict, err := p.extractEnumsDictFromFile(structsDirPath + "/" + file.Name())
 
 		// If we have an error, we return it
 		if err != nil {
@@ -299,17 +206,17 @@ func (p *openEngine) extractSchemasFromDirectory(structsDirPath string, chanSche
 	return AllSchemasDict, nil
 }
 
-func (p *openEngine) AddSchemas(schemasDict engine.SchemasDict) OpenEngine {
+func (p *openEngine) AddEnums(schemasDict engine.SchemasDict) OpenEngine {
 	p.Components.Schemas = engine.MergeMaps(p.Components.Schemas, schemasDict)
 	return p
 }
 
-func (p *openEngine) ParseSchemas(baseDirectory string, allIgnoredPaths ...[]string) OpenEngine {
+func (p *openEngine) ParseEnums(baseDirectory string, allIgnoredPaths ...[]string) OpenEngine {
 	// Create Mutex for SchemasDict
 	mx := &sync.Mutex{}
 
 	// ReInitialize WaitGroup for goroutines
-	WgSchema = &sync.WaitGroup{}
+	WgEnum = &sync.WaitGroup{}
 
 	// Create SchemasDict
 	AllSchemasDict := engine.SchemasDict{}
@@ -333,16 +240,16 @@ func (p *openEngine) ParseSchemas(baseDirectory string, allIgnoredPaths ...[]str
 	// Close the channel when we are done with it in goroutine
 	go func() {
 		defer close(chanSchemas)
-		WgSchema.Wait()
+		WgEnum.Wait()
 	}()
 
 	// Loop through all the models paths
 	for _, structsDirectoryPath := range structsDirectoryPaths {
 		// Add 1 to WaitGroup
-		WgSchema.Add(1)
+		WgEnum.Add(1)
 
 		// Extract the schemas from the directory in a goroutine
-		go p.extractSchemasFromDirectory(structsDirectoryPath, chanSchemas)
+		go p.extractEnumsFromDirectory(structsDirectoryPath, chanSchemas)
 	}
 
 	// Loop through all the schemas in the channel

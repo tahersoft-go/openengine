@@ -43,17 +43,18 @@ func ParseStructTagValues(tag string) OpenApiFieldTagValues {
 				continue
 			}
 			regexTagValueSplit := regexp.MustCompile(`(?sm)^(.*?):(.*?)$`)
-			tabSplitted := regexTagValueSplit.FindStringSubmatch(item)
-			if len(tabSplitted) > 2 {
-				value := tabSplitted[2]
-				values.In = TerIf(tabSplitted[1] == "in", value, values.In)
-				values.Example = TerIf(tabSplitted[1] == "example", value, values.Example)
-				values.Ref = TerIf(tabSplitted[1] == "$ref", value, values.Ref)
-				values.MaxLength = TerIf(tabSplitted[1] == "maxLength", value, values.MaxLength)
-				values.MinLength = TerIf(tabSplitted[1] == "minLength", value, values.MinLength)
-				values.Minimum = TerIf(tabSplitted[1] == "minimum", value, values.Minimum)
-				values.Maximum = TerIf(tabSplitted[1] == "maximum", value, values.Maximum)
-				values.Pattern = TerIf(tabSplitted[1] == "pattern", value, values.Pattern)
+			tagSplitted := regexTagValueSplit.FindStringSubmatch(item)
+			if len(tagSplitted) > 2 {
+				value := tagSplitted[2]
+				values.In = TerIf(tagSplitted[1] == "in", value, values.In)
+				values.Example = TerIf(tagSplitted[1] == "example", value, values.Example)
+				values.Ref = TerIf(tagSplitted[1] == "$ref", value, values.Ref)
+				values.MaxLength = TerIf(tagSplitted[1] == "maxLength", value, values.MaxLength)
+				values.MinLength = TerIf(tagSplitted[1] == "minLength", value, values.MinLength)
+				values.EnumValue = TerIf(tagSplitted[1] == "enumValue", value, values.EnumValue)
+				values.Minimum = TerIf(tagSplitted[1] == "minimum", value, values.Minimum)
+				values.Maximum = TerIf(tagSplitted[1] == "maximum", value, values.Maximum)
+				values.Pattern = TerIf(tagSplitted[1] == "pattern", value, values.Pattern)
 			}
 		}
 	}
