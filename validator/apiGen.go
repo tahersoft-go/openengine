@@ -3,8 +3,8 @@ package validator
 import "github.com/tahersoft-go/openengine/engine"
 
 type apiGen struct {
-	err       error
-	rawResult string
+	Err       error
+	RawResult string
 	// Ignored Directories to search
 	Ignore []string `yaml:"-"`
 	// ErrorResponses

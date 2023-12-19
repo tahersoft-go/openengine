@@ -27,7 +27,7 @@ func (v *openApiValidator) checkResponseRefExistsInSchema(responses engine.Respo
 func (v *openApiValidator) isRefExistsInSchema(ref string) bool {
 	splittedRefName := strings.Split(ref, "/")
 	refName := splittedRefName[len(splittedRefName)-1]
-	for schemaName, _ := range v.YamlDoc.Components.Schemas {
+	for schemaName := range v.YamlDoc.Components.Schemas {
 		if schemaName == refName {
 			return true
 		}

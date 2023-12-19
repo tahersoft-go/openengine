@@ -56,6 +56,13 @@ type OpenEngine interface {
 	extractSchemasFromDirectory(structsDirPath string, chanSchemas chan engine.ChanSchemas) (engine.SchemasDict, error)
 	AddSchemas(schemasDict engine.SchemasDict) OpenEngine
 	ParseSchemas(path string, ignoredPaths ...[]string) OpenEngine
+	//enums
+	extractEnumNamesFromComments(schemasFilePath string) ([]string, error)
+	mapEnumFieldsToSchemaDict(list []*ast.Field, structName string, schemasDict *engine.SchemasDict)
+	extractEnumsDictFromFile(schemasFilePath string) (engine.SchemasDict, error)
+	extractEnumsFromDirectory(structsDirPath string, chanSchemas chan engine.ChanSchemas) (engine.SchemasDict, error)
+	AddEnums(schemasDict engine.SchemasDict) OpenEngine
+	ParseEnums(path string, ignoredPaths ...[]string) OpenEngine
 	// Paths
 	extractPathsDataFromComments(handlersFilePath string) ([]engine.PathData, error)
 	extractPathsDictFromFile(handlersFilePath string) (engine.PathsDict, error)
@@ -141,11 +148,11 @@ func (p *openEngine) Generate(destinationDirectories ...string) (string, error) 
 		return p.rawResult, p.err
 	}
 
-	err = validator.ValidateRaw(string(yamlDocs))
+	er := validator.ValidateRaw(string(yamlDocs))
 
 	forceValidate := false
 
-	if err != nil {
+	if er != nil {
 		p.err = err
 		if forceValidate {
 			return p.rawResult, p.err
