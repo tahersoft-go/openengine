@@ -312,7 +312,8 @@ func (p *openEngine) ParseSchemas(baseDirectory string, allIgnoredPaths ...[]str
 	WgSchema = &sync.WaitGroup{}
 
 	// Create SchemasDict
-	AllSchemasDict := engine.SchemasDict{}
+	AllSchemasDict := p.Components.Schemas
+
 	var ignoredPaths []string
 	if len(allIgnoredPaths) > 0 {
 		ignoredPaths = allIgnoredPaths[0]

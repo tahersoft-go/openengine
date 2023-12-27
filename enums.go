@@ -219,7 +219,8 @@ func (p *openEngine) ParseEnums(baseDirectory string, allIgnoredPaths ...[]strin
 	WgEnum = &sync.WaitGroup{}
 
 	// Create SchemasDict
-	AllSchemasDict := engine.SchemasDict{}
+	AllSchemasDict := p.Components.Schemas
+
 	var ignoredPaths []string
 	if len(allIgnoredPaths) > 0 {
 		ignoredPaths = allIgnoredPaths[0]
