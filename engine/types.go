@@ -5,10 +5,12 @@ type ApiKeys string
 type AuthType string
 
 type ApiKeySecurityScheme struct {
-	Type        AuthType `yaml:"type,omitempty"`
-	Description string   `yaml:"description,omitempty"`
-	Name        string   `yaml:"name,omitempty"`
-	In          ApiKeys  `yaml:"in,omitempty"`
+	Type         AuthType `yaml:"type,omitempty"`
+	Description  string   `yaml:"description,omitempty"`
+	Name         string   `yaml:"name,omitempty"`
+	In           ApiKeys  `yaml:"in,omitempty"`
+	Scheme       string   `yaml:"scheme,omitempty"`
+	BearerFormat string   `yaml:"bearerFormat,omitempty"`
 }
 
 type HttpSecuritySchemeType string
@@ -132,6 +134,7 @@ type OpenApiFieldTagValues struct {
 	Maximum   string `yaml:"maximum,omitempty"`
 	Pattern   string `yaml:"pattern,omitempty"`
 	Ignored   bool   `yaml:"ignored,omitempty"`
+	Format    string `yaml:"format,omitempty"`
 }
 
 type ErrorResponses Responses
@@ -219,6 +222,7 @@ type MediaType struct {
 type Content struct {
 	ApplicationJson               MediaType `yaml:"application/json,omitempty"`
 	ApplicationXWwwFormUrlencoded MediaType `yaml:"application/x-www-form-urlencoded,omitempty"`
+	MultipartFormData             MediaType `yaml:"multipart/form-data,omitempty"`
 }
 
 type Schema struct {
