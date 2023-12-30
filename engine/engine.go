@@ -77,6 +77,24 @@ func MergeMaps[T MergeMapType](src map[string]T, dest map[string]T) map[string]T
 	return dest
 }
 
+func MergePaths(src map[string]Operations, dest map[string]Operations) map[string]Operations {
+	for key, value := range src {
+		// merge different http methods for common path into one dict
+		if _, ok := dest[key]; ok {
+			dest[key] = Operations{
+				Get:    TerIf(dest[key].Get != nil, dest[key].Get, value.Get),
+				Put:    TerIf(dest[key].Put != nil, dest[key].Put, value.Put),
+				Post:   TerIf(dest[key].Post != nil, dest[key].Post, value.Post),
+				Delete: TerIf(dest[key].Delete != nil, dest[key].Delete, value.Delete),
+				Patch:  TerIf(dest[key].Patch != nil, dest[key].Patch, value.Patch),
+			}
+		} else {
+			dest[key] = value
+		}
+	}
+	return dest
+}
+
 func GetResponseDescription(statusCode string) string {
 	if desc, ok := ResponseDescriptions[statusCode]; ok {
 		return desc
