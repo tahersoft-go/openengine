@@ -55,6 +55,7 @@ func ParseStructTagValues(tag string) OpenApiFieldTagValues {
 				values.Minimum = TerIf(tagSplitted[1] == "minimum", value, values.Minimum)
 				values.Maximum = TerIf(tagSplitted[1] == "maximum", value, values.Maximum)
 				values.Pattern = TerIf(tagSplitted[1] == "pattern", value, values.Pattern)
+				values.Format = TerIf(tagSplitted[1] == "format", value, values.Format)
 			}
 		}
 	}
@@ -85,6 +86,5 @@ func GetResponseDescription(statusCode string) string {
 }
 
 func GenerateOperationId(method string, path string) string {
-
-	return ToUpperFirstLetter(strings.Split(path, "/")[1]) + RestActions[strings.ToUpper(method)] + RestOperations[strings.ToUpper(method)]
+	return strings.Join(strings.Split(path, "/"), "_") + RestActions[strings.ToUpper(method)] + RestOperations[strings.ToUpper(method)]
 }

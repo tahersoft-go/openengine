@@ -131,6 +131,7 @@ func (p *openEngine) extractPathsDictFromFile(handlersFilePath string) (engine.P
 	var pathsDict = engine.PathsDict{}
 
 	commentsData, err := p.extractPathsDataFromComments(handlersFilePath)
+
 	if err != nil {
 		return nil, err
 	}
@@ -187,6 +188,11 @@ func (p *openEngine) extractPathsDictFromFile(handlersFilePath string) (engine.P
 							Ref: "#/components/schemas/" + commentData.ApiRequestRef,
 						},
 					},
+					MultipartFormData: engine.MediaType{
+						Schema: engine.DataSchema{
+							Ref: "#/components/schemas/" + commentData.ApiRequestRef,
+						},
+					},
 				},
 			}
 		}
@@ -202,6 +208,11 @@ func (p *openEngine) extractPathsDictFromFile(handlersFilePath string) (engine.P
 						},
 					},
 					ApplicationXWwwFormUrlencoded: engine.MediaType{
+						Schema: engine.DataSchema{
+							Ref: "#/components/schemas/" + commentData.ApiResponseRef,
+						},
+					},
+					MultipartFormData: engine.MediaType{
 						Schema: engine.DataSchema{
 							Ref: "#/components/schemas/" + commentData.ApiResponseRef,
 						},
@@ -232,6 +243,7 @@ func (p *openEngine) extractPathsDictFromFile(handlersFilePath string) (engine.P
 				response.Description = description
 				response.Content.ApplicationJson.Schema.Ref = ref
 				response.Content.ApplicationXWwwFormUrlencoded.Schema.Ref = ref
+				response.Content.MultipartFormData.Schema.Ref = ref
 				operation.Responses[statusCode] = response
 			}
 		}
