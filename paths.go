@@ -312,7 +312,7 @@ func (p *openEngine) extractPathsFromDirectory(handlersDirPath string, chanPaths
 		}
 
 		// Append the schemas to the global schemas map
-		AllPathsDict = engine.MergeMaps(AllPathsDict, pathsDict)
+		AllPathsDict = engine.MergePaths(AllPathsDict, pathsDict)
 	}
 	// Send ChanSchemas to channel if we have channel
 	if chanPaths != nil {
